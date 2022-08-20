@@ -23,7 +23,7 @@ router.get("", async (req, res, next) => {
 
 router.get("/:_id", authenticate, async (req, res, next) => {
     try {
-    
+
         console.log(req.params)
         let blog = await Blog.find({ user_id: req.params._id }).lean().exec();
 
@@ -38,11 +38,13 @@ router.get("/:_id", authenticate, async (req, res, next) => {
 router.post("", body('title').isLength({ min: 1 }), body('desc').isLength({ min: 1 }), body('image').isLength({ min: 1 }), authenticate, async (req, res, next) => {
     try {
 
+        console.log(req.user._id)
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             console.log(errors)
             return res.status(400).json({ message: errors });
         }
+        req.body.user_id = req.user._id;
         let blog = await Blog.create(req.body);
         return res.send(blog)
     }
